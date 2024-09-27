@@ -1,0 +1,9 @@
+{
+    "files.eol": "\n", // to use LF only as the end-of-line character
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.cursorStyle": "line", // Use a line cursor for easier navigation
+    "editor.smoothScrolling": true, // Enable smooth scrolling in the editor
+}

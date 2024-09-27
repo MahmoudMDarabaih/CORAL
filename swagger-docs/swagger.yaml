@@ -1,0 +1,1750 @@
+openapi: 3.0.0
+info:
+  title: E-Commerce API
+  version: 1.0.0
+  description: API documentation for E-Commerce system
+servers:
+  - url: 'http://localhost:4000'
+    description: Development server
+  - url: 'https://backend-final-g3-qngl.onrender.com/'
+    description: Production server
+
+paths:
+  /api/auth/signup:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUser'
+      responses:
+        '200':
+          description: User logged in successfully
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /api/auth/logout:
+    get:
+      tags: [Auth]
+      summary: Logout a user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+
+  /api/users:
+    get:
+      tags: [User]
+      summary: Get all users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '500':
+          description: Internal server error
+
+  /api/users/{id}:
+    get:
+      tags: [User]
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags: [User]
+      summary: Update a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: User not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [User]
+      summary: Delete a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+  /api/users/{id}/reviews:
+    get:
+      tags: [User]
+      summary: Get all reviews for a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of user reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  reviews:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewResponse'
+                      - type: string
+                        example: 'User has no reviews yet.'
+        '404':
+          description: User not found
+        '403':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /api/users/{id}/password:
+    put:
+      tags: [User]
+      summary: Update a user's password
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+        required: true
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Password updated successfully'
+        '400':
+          description: Bad request
+        '403':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /api/categories:
+    post:
+      tags: [Category]
+      summary: Create a new category
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data::
+            schema:
+              $ref: '#/components/schemas/CreateNewCategory'
+      responses:
+        '201':
+          description: Category created successfully
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+    get:
+      tags: [Category]
+      summary: Get all categories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '500':
+          description: Internal server error
+
+  /api/categories/{id}:
+    get:
+      tags: [Category]
+      summary: Get a category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Category not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags: [Category]
+      summary: Update a category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateCategory'
+      responses:
+        '200':
+          description: Category updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Category not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [Category]
+      summary: Delete a category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Category deleted successfully
+        '404':
+          description: Category not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+  /api/brands:
+    post:
+      tags: [Brand]
+      summary: Create a new brand
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNewBrand'
+      responses:
+        '201':
+          description: Brand created successfully
+        '400':
+          description: Invalid input, File too large.
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+    get:
+      tags: [Brand]
+      summary: Get all brands
+      responses:
+        '200':
+          description: List of brands
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandListResponse'
+        '500':
+          description: Internal server error
+
+  /api/brands/{id}:
+    get:
+      tags: [Brand]
+      summary: Get a brand by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Brand details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '404':
+          description: Brand not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags: [Brand]
+      summary: Update a brand by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateBrand'
+      responses:
+        '200':
+          description: Brand updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Brand not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [Brand]
+      summary: Delete a brand by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Brand deleted successfully
+        '404':
+          description: Brand not found
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+  /api/products:
+    post:
+      tags: [Product]
+      summary: Create a new product
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProduct'
+      responses:
+        '201':
+          description: Product created successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    get:
+      tags: [Product]
+      summary: Get all products
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: filter results by category
+        - in: query
+          name: brand
+          schema:
+            type: string
+          description: filter results by brand
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/{id}:
+    get:
+      tags: [Product]
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags: [Product]
+      summary: Update a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProduct'
+      responses:
+        '200':
+          description: Product updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [Product]
+      summary: Delete a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Product deleted successfully
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+
+  /api/products/newArrivals:
+    get:
+      tags: [Product]
+      summary: Get new arrivals
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of new arrival products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/handpickedCollections:
+    get:
+      tags: [Product]
+      summary: Get handpicked collections
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of handpicked collection products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/limitedEdition:
+    get:
+      tags: [Product]
+      summary: Get limited edition products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of limited edition products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/discountedProducts:
+    get:
+      tags: [Product]
+      summary: Get discounted products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of discounted products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/popularProducts:
+    get:
+      tags: [Product]
+      summary: Get popular products
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of popular products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+
+  /api/products/search?name=example:
+    get:
+      tags: [Product]
+      summary: Search for products
+      description: Retrieve a list of products based on the search criteria.
+      parameters:
+        - name: name
+          in: query
+          description: The name of the product to search for.
+          required: false
+          type: string
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+
+  /api/products/{id}/reviews:
+    get:
+      tags: [Product]
+      summary: Get all reviews for a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of product reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  reviews:
+                    oneOf:
+                      - type: array
+                        items:
+                          $ref: '#/components/schemas/ReviewResponse'
+                      - type: string
+                        example: 'Product has no reviews yet.'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+  /api/carouselSlides:
+    post:
+      tags: [CarouselSlide]
+      summary: Create a new carousel slide
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCarouselSlide'
+      responses:
+        '201':
+          description: Carousel slide created successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    get:
+      tags: [CarouselSlide]
+      summary: Get all carousel slides
+      responses:
+        '200':
+          description: List of carousel slides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarouselSlideListResponse'
+        '500':
+          description: Internal server error
+
+  /api/carouselSlides/{id}:
+    get:
+      tags: [CarouselSlide]
+      summary: Get a carousel slide by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Carousel slide details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarouselSlideResponse'
+        '404':
+          description: Carousel slide not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags: [CarouselSlide]
+      summary: Update a carousel slide by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCarouselSlide'
+      responses:
+        '200':
+          description: Carousel slide updated successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Carousel slide not found
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [CarouselSlide]
+      summary: Delete a carousel slide by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Carousel slide deleted successfully
+        '404':
+          description: Carousel slide not found
+        '500':
+          description: Internal server error
+
+  /api/orders/:
+    post:
+      tags: [Order]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrder'
+      responses:
+        '201':
+          description: Order created successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    get:
+      tags: [Order]
+      summary: Get all orders of a user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrders'
+        '400':
+          description: Bad request | No orders found
+        '401':
+          description: User not found | No token provided
+        '500':
+          description: Internal server error | User doesn't exist
+    
+  /api/orders/{id}:
+    get:
+      tags: [Order]
+      summary: Get an order by its ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '500':
+          description: Order doesn't exist
+ 
+
+  
+  /api/reviews:
+    post:
+      tags:
+        - Review
+      summary: Create a new review
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReview'
+        required: true
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /api/reviews/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get a review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Review details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '404':
+          description: Review not found
+        '500':
+          description: Internal server error
+
+    put:
+      tags:
+        - Review
+      summary: Update a review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReview'
+        required: true
+      responses:
+        '200':
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Review not found
+        '500':
+          description: Internal server error
+
+    delete:
+      tags:
+        - Review
+      summary: Delete a review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Review deleted successfully
+        '404':
+          description: Review not found
+        '500':
+          description: Internal server error
+
+
+  /api/wishlist:
+    post:
+      tags: [Wishlist]
+      summary: Add or remove a product from the user's wishlist
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WishlistProductId'
+      responses:
+        '200':
+          description: Product added to or removed from wishlist successfully
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '404':
+          description: User or product not found
+        '500':
+          description: Internal server error
+
+    get:
+      tags: [Wishlist]
+      summary: Get the user's wishlist
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved wishlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WishlistResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Wishlist or products not found
+        '500':
+          description: Internal server error
+
+    delete:
+      tags: [Wishlist]
+      summary: Delete the user's wishlist and all its items
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Wishlist and all items removed successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Wishlist not found
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    RegisterUser:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: John
+        lastName:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          minLength: 8
+          example: Password123!
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          example: Password123!
+      required:
+        - email
+        - password
+
+    UpdateUser:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: 'John'
+        lastName:
+          type: string
+          example: 'Doe'
+        email:
+          type: string
+          format: email
+          example: 'john_doe_updated@example.com'
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded
+      anyOf:
+        - required: [firstName]
+        - required: [lastName]
+        - required: [email]
+        - required: [image]
+
+    UserListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserResponse'
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 'e1e2e3e4-e5e6-e7e8-e9e0-e1e2e3e4e5e6'
+        username:
+          type: string
+          example: 'johndoe'
+        email:
+          type: string
+          format: email
+          example: 'johndoe@example.com'
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded
+
+    UpdatePassword:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          description: The current password of the user.
+        newPassword:
+          type: string
+          description: The new password to set for the user.
+      required:
+        - currentPassword
+        - newPassword
+        - confirmPassword
+      example:
+        currentPassword: "Password123!"
+        newPassword: "newPassword456!"
+        confirmPassword: "newPassword456!"
+
+    CreateNewCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Electronics
+        description:
+          type: string
+          maxLength: 150
+          example: All kinds of electronic items
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded (2MB max.)
+      required:
+        - name
+        - description
+        - image
+
+    UpdateCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Electronics
+        description:
+          type: string
+          maxLength: 150
+          example: Updated description of the category
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded (2MB max.)
+      anyOf:
+        - required: [name]
+        - required: [description]
+        - required: [image]
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        imagePath:
+          type: string
+          format: uri
+          example: https://firebasestorage.googleapis.com/v0/b/tap-e-commerce-cdn.appspot.com/o/files%2Fbrands%2F1724592107894-ClZmdMG8_400x400.jpg?alt=media&token=d47788bb-fcbe-4473-afa6-0b9e5c262e20
+
+    CategoryListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryResponse'
+
+    CreateNewBrand:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Apple
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded (2MB max.)
+      required:
+        - name
+        - image
+
+    UpdateBrand:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: Apple
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded
+
+    BrandResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: Gucci
+        imagePath:
+          type: string
+          format: uri
+          example: https://firebasestorage.googleapis.com/v0/b/tap-e-commerce-cdn.appspot.com/o/files%2Fbrands%2F1724592107894-ClZmdMG8_400x400.jpg?alt=media&token=d47788bb-fcbe-4473-afa6-0b9e5c262e20
+
+    BrandListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        brands:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandResponse'
+
+    CreateProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: iPhone 14
+        brief:
+          type: string
+          maxLength: 50
+          example: just a string
+        description:
+          type: string
+          maxLength: 150
+          example: Latest model of iPhone
+        price:
+          type: number
+          format: float
+          example: 999.99
+        discountRate:
+          type: number
+          format: float
+          example: 0.1
+        categoryName:
+          type: string
+        brandName:
+          type: string
+        stock:
+          type: integer
+          example: 50
+      required:
+        - name
+        - description
+        - price
+        - discountRate 
+        - categoryName
+        - brandName
+        - stock
+
+    UpdateProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: iPhone 14
+        brief:
+          type: string
+          maxLength: 50
+          example: just a string
+        description:
+          type: string
+          maxLength: 150
+          example: Updated description of iPhone
+        price:
+          type: number
+          format: float
+          example: 899.99
+        discountRate:
+          type: number
+          format: float
+          example: 0.1
+        categoryName:
+          type: string
+        brandName:
+          type: string
+        stock:
+          type: integer
+          example: 100
+      anyOf:
+        - required: [name]
+        - required: [description]
+        - required: [price]
+        - required: [discountRate]
+        - required: [categoryName]
+        - required: [brandName]
+        - required: [stock]
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example:  Product name'
+        brief:
+          type: string
+          example:  Product brief'
+        description:
+          type: string
+          example: 'Product description'
+        price:
+          type: number
+          format: float
+          example: 299.99
+        rating:
+          type: number
+          format: float
+          example: 3.5
+        discountRate:
+          type: number
+          format: float
+          example: 0.5
+        stock:
+          type: integer
+          example: 10
+        Category:
+          $ref: '#/components/schemas/CategoryResponse'
+        Brand:
+          $ref: '#/components/schemas/BrandResponse'
+        ProductImages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImage'
+
+    ProductListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductResponse'
+    ProductImage:
+      type: object
+      properties:
+        path:
+          type: string
+          format: uri
+          example: https://firebasestorage.googleapis.com/v0/b/tap-e-commerce-cdn.appspot.com/o/files%2Fproducts%2F1724770066227-ClZmdMG8_400x400.jpg?alt=media&token=b6a4b8c0-a551-4023-9374-4e676ecad2b5
+    
+    CreateCarouselSlide:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 100
+          example: Summer Sale
+        imagePath:
+          type: string
+          format: binary
+          description: The image file to be uploaded (2MB max.)
+        description:
+          type: string
+          maxLength: 250
+          example: Don't miss out on our summer sale!
+        slideOrder:
+          type: integer
+          example: 3
+        categoryName:
+          type: string
+          example: Phone
+        brandName:
+          type: string
+          example: Apple
+      required:
+        - imagePath
+        - title
+        - image
+        - description
+        - slideOrder
+        - categoryName
+        - brandName
+
+    UpdateCarouselSlide:
+      type: object
+      properties:
+        imagePath:
+          type: string
+          format: uri
+          example: https://example.com/new-image.jpg
+        title:
+          type: string
+          maxLength: 100
+          example: Winter Sale
+        image:
+          type: string
+          format: binary
+          description: The image file to be uploaded
+        description:
+          type: string
+          maxLength: 250
+          example: Check out our new winter sale!
+        slideOrder:
+          type: integer
+          example: 1
+        categoryName:
+          type: string
+          example: Phone
+        brandName:
+          type: Apple
+      anyOf:
+        - required: [imagePath]
+        - required: [title]
+        - required: [description]
+        - required: [slideOrder]
+        - required: [categoryName]
+        - required: [brandName]
+
+    CarouselSlideResepons:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        imagePath:
+          type: string
+          format: uri
+          example: https://firebasestorage.googleapis.com/v0/b/tap-e-commerce-cdn.appspot.com/o/files%2Fbrands%2F1724592107894-ClZmdMG8_400x400.jpg?alt=media&token=d47788bb-fcbe-4473-afa6-0b9e5c262e20
+        title:
+          type: string
+          example: 'CarouselSlide title'
+        description:
+          type: string
+          example: 'CarouselSlide description'
+        slideOrder:
+          type: integer
+          example: 1
+        categoryName:
+          type: string
+          example: 'bags'
+        brandName:
+          type: string
+          example: 'Apple'
+
+    CarouselSlideListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        slides:
+          type: array
+          items:
+            $ref: '#/components/schemas/CarouselSlideResponse'
+
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+    CreateOrder:
+      type: object
+      properties:
+        itemsList:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        address:
+          $ref: '#/components/schemas/OrderAddress'
+        phoneNumber:
+          type: string
+          format: international-phone
+          example: "+970123456789"
+        orderOwner:
+          type: string
+          example: "John Doe"
+        cardNumber:
+          type: string
+          format: credit-card
+          example: "4111111111111111"
+
+      required:
+        - items
+        - address
+        - phoneNumber
+        - orderOwner
+        - cardNumber
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the product.
+        quantity:
+          type: integer
+          example: 5
+      required:
+        - id
+        - quantity
+    OrderAddress:
+      type: object
+      properties:
+        state:
+          type: string
+          example: "Cairo"
+        city:
+          type: string
+          example: "New Cairo"
+        street:
+          type: string
+          example: "Abbas Al Akkad"
+        pin:
+          type: string
+          example: "12345"
+      required:
+        - state
+        - city
+        - street
+        - pin
+    UserOrders:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the order.
+          example: "136e4839-5fce-4120-bda7-135796f95caf"
+        createdAt:
+          type: string
+          example: "2024-08-25T19:36:08.000Z"
+        totalAmount:
+          type: string
+          example: "2999.97"
+        orderStatus:
+          type: string
+          example: "Processing"
+
+    CreateReview:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Rating given to the product, from 1 to 5.
+        comment:
+          type: string
+          description: Review comment or feedback.
+        productId:
+          type: string
+          format: uuid
+          description: ID of the product being reviewed.
+      required:
+        - rating
+        - productId
+
+    UpdateReview:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Updated rating given to the product, from 1 to 5.
+        comment:
+          type: string
+          description: Updated review comment or feedback.
+      required:
+        - rating
+
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Rating given to the product.
+        comment:
+          type: string
+        product:
+          type: object
+          properties:
+            name:
+              type: string
+            rating:
+              type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - rating
+        - product
+        - createdAt
+
+    ReviewListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReviewResponse'
+
+
+    OrderResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        order:
+          type: object
+          properties:
+            subtotal:
+              type: number
+              example: 1000
+            totalDiscount:
+              type: number
+              example: 100
+            deliveryFees:
+              type: number
+              example: 0
+            grandtotal:
+              type: number
+              example: 900
+            phoneNumber:
+              type: string
+              example: "+970123456789"
+            paymentDetails:
+              type: string
+              example: "Credit Card"
+            Address:
+              type: object
+              properties:
+                state:
+                  type: string
+                  example: "Cairo"
+                city:
+                  type: string
+                  example: "New Cairo"
+                street:
+                  type: string
+                  example: "Abbas Al Akkad"
+                pin:
+                  type: integer
+                  example: 12345
+            OrderItems:
+              type: array
+              items:
+                type: object
+                properties:
+                  quantity:
+                    type: integer
+                    example: 3
+                  unitPrice:
+                    type: number
+                    example: 200
+                  totalPrice:
+                    type: number
+                    example: 600
+                  Product:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: "57e5db2c-11ad-4524-ab6d-2ac18ac82799"
+                      name:
+                        type: string
+                        example: "iPhone 14"
+                      brief:
+                        type: string
+                        example: "test"
+
+    WishlistProductId:
+      type: object
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: 746194e2-12b8-4335-8202-baab1676cfbb
+      required:
+        - productId
+
+    WishlistResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        totalWishListItems:
+          type: integer
+          example: 5
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: Example Product
+        price:
+          type: number
+          format: float
+          example: 99.99
+        description:
+          type: string
+          example: A brief description of the product
+        imageUrl:
+          type: string
+          format: uri
+          example: https://example.com/product-image.jpg
+      required:
+        - id
+        - name
+        - price
+
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+
+                securitySchemes:
+                  bearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT

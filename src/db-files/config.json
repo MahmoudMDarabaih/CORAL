@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "barasy10000",
+    "database": "ecommerce_system",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "barasy10000",
+    "database": "ecommerce_system",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "u3cuntvugdmxyioy",
+    "password": "s7uh0YZgzE3ApWLeVIZJ",
+    "database": "b5kgksntpvmgho6mbp86",
+    "host": "b5kgksntpvmgho6mbp86-mysql.services.clever-cloud.com",
+    "dialect": "mysql"
+  }
+}

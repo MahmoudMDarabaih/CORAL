@@ -1,0 +1,22 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [main, backend-dev] # Adjust this if your main branch has a different name
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # Adjust this to your project's Node.js version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
